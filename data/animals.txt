@@ -41,7 +41,7 @@ Sheep
 Shark
 Seal
 Seahorse
-Sea Lion
+SeaLion
 Scorpion
 Sardine
 Sandpiper
@@ -127,7 +127,7 @@ Hawk
 Hare
 Hamster
 Gull
-Guinea Pig
+GuineaPig
 Guanaco
 Grouse
 Grasshopper
