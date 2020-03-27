@@ -2,6 +2,7 @@
 #
 # Quick hack at a Perl version for generating random (repo) names.
 #
+# Added support for "short" names.
 #
 
 use Getopt::Long;
@@ -13,6 +14,8 @@ my $animals_file    = "$TOPDIR/data/animals.txt";
 
 my $opt_help  = 0;
 my $opt_upper = 0;
+my $opt_short = 0;
+my $SHORT_LIMIT = 3;  # Max length for "short" string option
 
 sub usage
 {
@@ -20,12 +23,60 @@ sub usage
 Usage: $0 [OPTIONS]
 
    -u|--upper      Show name as UPPERCASE.
+   -s|--short      Show a short name
    -h|--help       Print this help message
 
 EOF
     return;
 }
 
+
+#
+# Best effort to find a random item in input list that is
+# less-than-equal to $SHORT_LIMIT length.  We have a crude
+# max try method of only trying N times, where N=num items in list.
+# In that case, you could return value greater than $SHORT_LIMIT, but
+# will always return some value.
+#
+sub get_short_value(@)
+{
+    my @input = @_;
+    my $done = 0;
+    my $value;
+    my $num_input = scalar(@input);
+    my $count = $num_input;  # Fail-safe, add try counter to avoid infinite loop
+
+    do {
+        $count--;
+
+        my $rand  = int( rand($num_input) );
+
+        $value = $input[ $rand ];
+
+        my $len = length( $value );
+
+        if ( ($len <= $SHORT_LIMIT) || ($count < 0) ) {
+            $done = 1;
+        }
+
+        #print "DONE=$done, COUNT=$count, LEN=$len, VALUE=$value, RAND=$rand\n";
+    } while (!$done);
+
+    return $value;
+}
+
+sub get_value(@)
+{
+    my @input = @_;
+    my $value;
+    my $rand;
+    my $num_input = scalar(@input);
+
+    $rand  = int( rand($num_input) );
+    $value = $input[ $rand ];
+
+    return $value;
+}
 
 ########
 # MAIN
@@ -34,6 +85,7 @@ EOF
 my $rc = GetOptions(
             "help"         => \$opt_help,
             "upper"        => \$opt_upper,
+            "short"        => \$opt_short,
                     );
 
 if ($opt_help) {
@@ -58,19 +110,15 @@ chomp(@list2);
 close (FILE1);
 close (FILE2);
 
-# Get number of items in array
-my $file1_max = scalar @list1;
-my $file2_max = scalar @list2;
+my $w1, $w2;
 
-# Get random entry from each array
-my $rand1 = int (rand($file1_max));
-my $rand2 = int (rand($file2_max));
-
-#print "file1_max: $file1_max  file2_max: $file2_max\n";
-#print "    rand1: $rand1  rand2: $rand2\n";
-
-my $w1 = $list1[$rand1];
-my $w2 = $list2[$rand2];
+if ($opt_short) {
+    $w1 = get_short_value(@list1);
+    $w2 = get_short_value(@list2);
+} else {
+    $w1 = get_value(@list1);
+    $w2 = get_value(@list2);
+}
 
 if ($opt_upper) {
     # Print codename in UPPERCASE
