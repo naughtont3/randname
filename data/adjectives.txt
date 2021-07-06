@@ -32,6 +32,7 @@ handsome
 homely
 light
 long
+mad
 magnificent
 misty
 motionless
@@ -317,6 +318,7 @@ fresh
 juicy
 ripe
 rotten
+sad
 salty
 sour
 spicy
